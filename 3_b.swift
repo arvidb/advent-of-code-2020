@@ -25,4 +25,4 @@ for check in checks {
     result.append(nTrees)
 }
 
-print(result.reduce(1, { $0 * $1 }))
+print(result.reduce(1, *))
