@@ -1,7 +1,3 @@
-#!/usr/bin/swift -frontend -interpret -enable-source-import -I.
-
-import helpers
-
 var map = [String]()
 while let line = readLine() {
     map.append(line)

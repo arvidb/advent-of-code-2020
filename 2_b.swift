@@ -1,7 +1,3 @@
-#!/usr/bin/swift -frontend -interpret -enable-source-import -I.
-
-import helpers
-
 var numValid = 0
 while let line = readLine() {
     let tmp = line.split(separator: " ")
