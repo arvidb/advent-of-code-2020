@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iterator>
 #include <unordered_map>
+#include <functional>
 
 using namespace std;
 
@@ -21,53 +22,38 @@ bool isValid(const unordered_map<string, string>& passport) {
         return false;
     }
 
-    bool valid = true;
-    for (auto kv : passport) {
-        if (kv.first == "byr") {
-            auto val = stoi(kv.second);
-            valid = val >= 1920 && val <= 2002;
-        }
-        else if (kv.first == "iyr") {
-            auto val = stoi(kv.second);
-            valid = val >= 2010 && val <= 2020;
-        }
-        else if (kv.first == "eyr") {
-            auto val = stoi(kv.second);
-            valid = val >= 2020 && val <= 2030;
-        }
-        else if (kv.first == "hgt") {
-            if (kv.second.find("cm") != string::npos) {
-                auto val = stoi(kv.second);
-                valid = val >= 150 && val <= 193;
-            } else if (kv.second.find("in") != string::npos) {
-                auto val = stoi(kv.second);
-                valid = val >= 59 && val <= 76;
-            } else {
-                valid = false;
-            }
-        }
-        else if (kv.first == "hcl") {
-            if (kv.second[0] != '#') {
-                valid = false;
-            } else {
-                auto s = kv.second.substr(1);
-                valid = s.length() == 6 && std::all_of(begin(s), end(s), [](auto c) { return isxdigit(c); });
-            }
-        }
-        else if (kv.first == "ecl") {
+    unordered_map<string, function<bool(string)>> validators = {
+        {"cid", [](auto s) { return true; }},
+        {"byr", [](auto s) { auto val = stoi(s); return val >= 1920 && val <= 2002; }},
+        {"iyr", [](auto s) { auto val = stoi(s); return val >= 2010 && val <= 2020; }},
+        {"eyr", [](auto s) { auto val = stoi(s); return val >= 2020 && val <= 2030; }},
+        {"pid", [](auto s) { return s.length() == 9; }},
+        {"ecl", [](auto s) { 
             static const auto colors = { "amb", "blu", "brn", "gry", "grn", "hzl", "oth"};
-            valid = 1 == std::count(begin(colors), end(colors), kv.second);
-        }
-        else if (kv.first == "pid") {
-            valid = kv.second.length() == 9;
-        }
+            return std::count(begin(colors), end(colors), s);
+        }},
+        {"hcl", [](auto s) { 
+            if (s[0] != '#') {
+                return false;
+            } else {
+                auto str = s.substr(1);
+                return str.length() == 6 && std::all_of(begin(str), end(str), [](auto c) { return isxdigit(c); });
+            }
+         }},
+        {"hgt", [](auto s) { 
+            if (s.find("cm") != string::npos) {
+                auto val = stoi(s);
+                return val >= 150 && val <= 193;
+            } else if (s.find("in") != string::npos) {
+                auto val = stoi(s);
+                return val >= 59 && val <= 76;
+            } else {
+                return false;
+            }
+        }}
+    };
 
-        if (!valid) {
-            return false;
-        }
-    }
-
-    return true;
+    return all_of(begin(passport), end(passport), [&](auto kv) { return validators[kv.first](kv.second); });
 }
 
 int main() {
