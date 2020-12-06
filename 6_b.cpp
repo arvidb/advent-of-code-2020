@@ -10,7 +10,7 @@ using namespace std;
 int main() {
 
     const function<int(const unordered_map<char, int>&, int)> ack = [](const auto& q, int p) {
-        return accumulate(begin(q), end(q), 0, [&](int a, const auto& kv) { return a + (kv.second == p ? 1 : 0); });
+        return count_if(begin(q), end(q), [&](const auto& kv) { return kv.second == p ? 1 : 0; });
     };
     long sum = 0;
     unordered_map<char, int> q;
