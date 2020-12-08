@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <unordered_map>
+#include <unordered_set>
 #include <functional>
 
 using namespace std;
@@ -10,13 +11,13 @@ using namespace std;
 struct Instruction {
     string op;
     int arg;
-    bool exec = false;
 };
 
 struct Cpu {
     int ip = 0;
     int ack = 0;
     bool halt = false;
+    unordered_set<int> ipcache;
 };
 
 const unordered_map<string, function<void(Cpu&, Instruction&)>> operations = {
@@ -32,8 +33,8 @@ bool exec(Cpu& cpu, vector<Instruction> instructions, int jmp) {
             ins.op = "nop";
         }
 
-        if (!ins.exec) {
-            ins.exec = true;
+        if (!cpu.ipcache.count(cpu.ip)) {
+            cpu.ipcache.insert(cpu.ip);
             operations.at(ins.op)(cpu, ins);
         } else {
             cpu.halt = true;
