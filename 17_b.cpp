@@ -49,8 +49,10 @@ int main() {
         }
     }
 
+    int active = 0;
     matrix_t matrix2 = matrix;
     for (int cycle=0; cycle < 6; cycle++) {
+        active = 0;
         for (int x = 0; x < N; x++) {
             for (int y = 0; y < N; y++) {
                 for (int z = 0; z < N; z++) {
@@ -63,25 +65,14 @@ int main() {
                         else if (!isActive(matrix, x, y, z, w) && (n == 3)) {
                             matrix2[x][y][z][w] = '#';
                         }
+
+                        active += isActive(matrix2, x, y, z, w) ? 1 : 0;
                     }
                 }
             }
         }
 
         matrix = matrix2;
-    }
-
-    int active = 0;
-    for (int x = 0; x < N; x++) {
-        for (int y = 0; y < N; y++) {
-            for (int z = 0; z < N; z++) {
-                for (int w = 0; w < N; w++) {
-                    if (isActive(matrix, x, y, z, w)) {
-                        active++;
-                    }
-                }
-            }
-        }
     }
 
     cout << active << endl;
